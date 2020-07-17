@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>week4_login</title>
+    <link rel="stylesheet" href="css/all.css">
+</head>
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Microsoft JhengHei', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    
+    html,
+    body {
+        height: 100%;
+        text-align: center;
+    }
+    
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .form-signin {
+        width: 100%;
+        max-width: 330px;
+        padding: 15px;
+        margin: auto;
+    }
+</style>
+
+<body>
+    <div id="app" class="container">
+        <form class="form-signin" @submit.prevent="signin">
+            <h1 class="h3 mb-3 font-weight-normal text-primary">
+                請先登入
+            </h1>
+            <div class="form-group">
+                <label for="inputEmail" class="sr-only">Email address</label>
+                <input id="inputEmail" v-model="user.email" type="email" class="form-control" placeholder="Email address" required autofocus>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword" class="sr-only">Password</label>
+                <input id="inputPassword" v-model="user.password" type="password" class="form-control" placeholder="Password" required>
+            </div>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">
+              登入
+            </button>
+            <p class="mt-5 mb-3 text-muted">
+                &copy; 2020~∞ - YunHsuanTsai
+            </p>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        let app = new Vue({
+            el: '#app',
+            data: {
+                user: {
+                    email: '',
+                    password: ''
+                }
+            },
+            methods: {
+                signin() {
+                    // POST api/auth/login
+                    const api = `https://course-ec-api.hexschool.io/api/auth/login`;
+                    axios.post(api, this.user)
+                        .then((res) => {
+                            const token = res.data.token;
+                            const expired = res.data.expired; // 到期日
+                            // 把token expired存入cookie
+                            // expireed轉換時間格式
+                            document.cookie = `token=${token}; expires=${new Date(expired * 1000)}; path=/`;
+                            window.location = 'products.html'; // 登入成功，跳轉到產品頁
+                        }).catch((err) => {
+                            console.log(err);
+                        });
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

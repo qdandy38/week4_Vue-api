@@ -1,0 +1,7 @@
+// Required
+@import "../node_modules/bootstrap/scss/functions";
+@import "./helpers/variables";
+@import "../node_modules/bootstrap/scss/mixins";
+@import "../node_modules/bootstrap/scss/bootstrap";
+// 自定義
+@import "./component/background"
