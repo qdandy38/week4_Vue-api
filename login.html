@@ -76,11 +76,14 @@
                     const api = `https://course-ec-api.hexschool.io/api/auth/login`;
                     axios.post(api, this.user)
                         .then((res) => {
+                            console.log(res);
                             const token = res.data.token;
                             const expired = res.data.expired; // 到期日
+                            const uuid = res.data.uuid; // 登入成功後回傳的uuid
                             // 把token expired存入cookie
                             // expireed轉換時間格式
                             document.cookie = `token=${token}; expires=${new Date(expired * 1000)}; path=/`;
+                            document.cookie = `uuid=${uuid}; expires=${new Date(expired * 1000)}; path=/`; // 登入成功後將管理者uuid存入coolies
                             window.location = 'products.html'; // 登入成功，跳轉到產品頁
                         }).catch((err) => {
                             console.log(err);

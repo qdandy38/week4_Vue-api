@@ -16,13 +16,14 @@ new Vue({
         isNew: false,
         user: {
             token: '',
-            uuid: '822f665f-fdb8-48cd-a3c7-a13100ae246a',
+            uuid: '',
             path: 'https://course-ec-api.hexschool.io'
         }
     },
     created() {
         // 取得cookie內的token，如果沒有就返回登入頁面
         this.user.token = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+        this.user.uuid = document.cookie.replace(/(?:(?:^|.*;\s*)uuid\s*\=\s*([^;]*).*$)|^.*$/, "$1");
         axios.defaults.headers.common.Authorization = `Bearer ${this.user.token}`; // 預設帶入token
         if (this.user.token === '') {
             window.location = 'login.html';
