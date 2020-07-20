@@ -1,9 +1,13 @@
 import pagination from './pagination.js';
+import productModal from './productModal.js';
+import delModal from './delModal.js';
 Vue.component('pagination', pagination);
+Vue.component('productModal', productModal);
+Vue.component('delModal', delModal);
 new Vue({
     el: '#app',
     data: {
-        product: [], // AJAX取得的產品資料
+        products: [], // AJAX取得的產品資料
         pagination: {}, // 分頁資訊
         tempProduct: {
             imageUrl: [],
@@ -19,6 +23,7 @@ new Vue({
     created() {
         // 取得cookie內的token，如果沒有就返回登入頁面
         this.user.token = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+        axios.defaults.headers.common.Authorization = `Bearer ${this.user.token}`; // 預設帶入token
         if (this.user.token === '') {
             window.location = 'login.html';
         } else {
@@ -28,69 +33,23 @@ new Vue({
     methods: {
         getProducts(page = 1) { // AJAX取得遠端產品資料
             const api = `${this.user.path}/api/${this.user.uuid}/admin/ec/products?page=${page}`;
-            axios.defaults.headers.common.Authorization = `Bearer ${this.user.token}`; // 預設帶入token
+
             axios.get(api)
                 .then((res) => {
-                    this.product = res.data.data; // 將AJAX取得的產品資料存入this.product
+                    this.products = res.data.data; // 將AJAX取得的產品資料存入this.products
                     this.pagination = res.data.meta.pagination; // 將AJAX取得的分頁資訊存入this.pagination
                 })
                 .catch((err) => {
                     console.log(`資料取得錯誤，${err}`);
                 })
         },
-        updateProduct() { // 新增or編輯產品
-            // 新增商品
-            let api = `${this.user.path}/api/${this.user.uuid}/admin/ec/product`
-            let methods = `post`;
-            if (!this.isNew) { // 編輯商品
-                api = `${this.user.path}/api/${this.user.uuid}/admin/ec/product/${this.tempProduct.id}`;
-                methods = `patch`;
-            }
-            axios.defaults.headers.common.Authorization = `Bearer ${this.user.token}`; // 預設帶入token
-            axios[methods](api, this.tempProduct)
-                .then(() => {
-                    $('#productModal').modal('hide'); // 成功新增or修改遠端資料後，關閉modal
-                    Swal.fire({
-                        toast: true,
-                        title: (this.isNew ? '新增成功' : '編輯成功'),
-                        icon: 'success',
-                        showConfirmButton: false,
-                        timer: 1500,
-                        padding: '2rem'
-                    })
-                    this.getProducts(); // 重新取得遠端資料
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        },
         getProduct(id) { // 取得單一商品資料
             const api = `${this.user.path}/api/${this.user.uuid}/admin/ec/product/${id}`;
-            axios.defaults.headers.common.Authorization = `Bearer ${this.user.token}`; // 預設帶入token
+
             axios.get(api)
                 .then((res) => {
                     this.tempProduct = res.data.data; // 取得的單一產品資料存入tempProduct，作為等等modal開啟的預設值
                     $('#productModal').modal('show'); // 確認資料存入後再開啟Modal
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        },
-        delProduct() { // 刪除
-            const api = `${this.user.path}/api/${this.user.uuid}/admin/ec/product/${this.tempProduct.id}`;
-            axios.defaults.headers.common.Authorization = `Bearer ${this.user.token}`; // 預設帶入token
-            axios.delete(api)
-                .then(() => {
-                    $('#delModal').modal('hide'); // 關閉Modal
-                    Swal.fire({
-                        toast: true,
-                        title: '刪除成功!',
-                        icon: 'success',
-                        showConfirmButton: false,
-                        timer: 1500,
-                        padding: '2rem'
-                    })
-                    this.getProducts();
                 })
                 .catch((err) => {
                     console.log(err);
